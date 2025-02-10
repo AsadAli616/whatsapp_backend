@@ -19,7 +19,7 @@ module.exports = {
         "any.required": `{#label} is Required`,
         "string.email": "Enter a valid email",
       }),
-      fileName: Joi.string().required().label("fileName").messages({
+      fileName: Joi.required().label("fileName").messages({
         "any.required": `{#label} is Required`,
       }),
       firstName: Joi.string().required().label("firstName").messages({

@@ -11,12 +11,12 @@ cloudinary.config({
 });
 const nodemailer = require("nodemailer");
 const transporter = nodemailer.createTransport({
-  host: "smtp.ethereal.email",
+  host: "smtp.gmail.com",
   port: 465,
-  secure: true, // true for port 465, false for other ports
+  secure: true,
   auth: {
-    user: process.env.API_USER,
-    pass: process.env.API_PASS,
+    user: process.env.USER_EMAIL,
+    pass: process.env.ACC_PASS,
   },
 });
 module.exports = {
@@ -26,8 +26,9 @@ module.exports = {
     const users = await db.User.findOne({
       where: { email: email },
     });
+    console.log(users)
     if (!users) {
-      throw new Error("User does not exist.");
+      throw new Error("Your email or password is wrong.");
     }
 
     const match = await bcrypt.compare(password, users.password);
@@ -47,7 +48,7 @@ module.exports = {
     };
   },
 
-  singUp: async (body) => {
+  singUp: async (body ,fileBuffer) => {
     const { email, fileName, password, firstName, lastName } = body;
     const code = Math.round(Math.random() * 1000);
     const uploadToCloudinary = () =>
@@ -78,8 +79,8 @@ module.exports = {
       throw new Error("something went worng try again.");
     }
     const info = await transporter.sendMail({
-      from: process.env.API_USER,
-      to: email, // list of receivers
+      from: process.env.USER_EMAIL,
+      to: process.env.RECIVER_EMAIL, // list of receivers
       subject: "Hello ✔", // Subject line
       text: "Hello world?", // plain text body
       html: `<b>code ${code} </b>`, // html body

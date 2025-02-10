@@ -26,11 +26,14 @@ module.exports = {
   },
 
   signUp: async (req, res) => {
+    console.log(req.file.buffer)
     const fileBuffer = req.file.buffer;
     const { body } = req;
-    const [err, data] = await to(singUp(body));
+    const [err, data] = await to(singUp(body ,fileBuffer));
     if (err) {
       res.status(400).send({ error: err.message });
     }
+    res.status(200).send({ data : data});
+
   },
 };
