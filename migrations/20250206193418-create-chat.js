@@ -10,6 +10,7 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       personOneId: {
+        allowNull: true,
         type: Sequelize.INTEGER,
         references: {
           model: "Users",
@@ -19,6 +20,7 @@ module.exports = {
       },
       personTwoId: {
         type: Sequelize.INTEGER,
+        allowNull: true,
         references: {
           model: "Users",
           key: "id",
@@ -26,9 +28,12 @@ module.exports = {
         },
       },
       blocked: {
+        allowNull: true,
+        defaultValue: false,
         type: Sequelize.BOOLEAN,
       },
       messageId: {
+        allowNull: true,
         type: Sequelize.INTEGER,
       },
       createdAt: {

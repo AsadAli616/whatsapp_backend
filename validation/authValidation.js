@@ -20,15 +20,25 @@ module.exports = {
         "string.email": "Enter a valid email",
       }),
       fileName: Joi.required().label("fileName").messages({
-        "any.required": `{#label} is Required`,
+        "any.required": `Image  is Required`,
       }),
       firstName: Joi.string().required().label("firstName").messages({
         "any.required": `{#label} is Required`,
       }),
-      lastName: Joi.string().required().label("lastName").messages({
+
+      password: Joi.string().required().label("Password").messages({
         "any.required": `{#label} is Required`,
       }),
-      password: Joi.string().required().label("Password").messages({
+    });
+    return schema.validate(obj, { allowUnknown: true });
+  },
+  verifyAccount: async (obj) => {
+    const schema = Joi.object({
+      email: Joi.string().email().required().label("Email").messages({
+        "any.required": `{#label} is Required`,
+        "string.email": "Enter a valid email",
+      }),
+      code: Joi.string().required().label("code").messages({
         "any.required": `{#label} is Required`,
       }),
     });

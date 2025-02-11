@@ -36,9 +36,10 @@ module.exports = (sequelize, DataTypes) => {
           key: "id",
           as: "personTwoId",
         },
+        allowNull: true,
       },
-      blocked: DataTypes.BOOLEAN,
-      messageId: DataTypes.INTEGER,
+      blocked: { type: DataTypes.BOOLEAN, defaultValue: false },
+      messageId: { type: DataTypes.INTEGER, allowNull: true },
     },
     {
       sequelize,
