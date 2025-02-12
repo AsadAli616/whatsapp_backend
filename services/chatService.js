@@ -1,17 +1,37 @@
+const { Op } = require("sequelize");
 const db = require("../models");
 
 module.exports = {
   createChat: async (body) => {
     const { id, email } = body;
-    console.log(id, email);
+    // console.log(id, email);
     const user = await db.User.findOne({
       where: { email: email },
     });
     if (!user) {
       throw new Error("user not exist");
     }
+
     const findChat = await db.Chat.findOne({
-      where: { personOneId: id, personTwoId: user.id },
+      where: {
+        [Op.or]: [
+          { personOneId: id, personTwoId: user.id },
+          { personOneId: user.id, personTwoId: id },
+        ],
+        blocked: false,
+      },
+      include: [
+        {
+          model: db.User,
+          as: "personOne",
+          attributes: ["id", "firstName", "Pic", "email"],
+        },
+        {
+          model: db.User,
+          as: "personTwo",
+          attributes: ["id", "firstName", "Pic", "email"],
+        },
+      ],
     });
     if (findChat) {
       if (findChat.blocked) {
@@ -31,41 +51,69 @@ module.exports = {
     }
     const Message = await db.Message.create({
       chatId: Chat.id,
-      message: "",
+      message: "hey there",
       personId: id,
     });
 
     if (!Message) {
       throw new Error("somethig went wrong");
     }
-
-    const UpdateChat = await db.Chat.update(
-      {
-        messageId: Message.id,
+    const findChats = await db.Chat.findOne({
+      where: {
+        [Op.or]: [
+          { personOneId: id, personTwoId: user.id },
+          { personOneId: user.id, personTwoId: id },
+        ],
+        blocked: false,
       },
-      { where: { id: Chat.id } }
-    );
-    if (UpdateChat[0] == 0) {
-      throw new Error("somethig went wrong");
+      include: [
+        {
+          model: db.User,
+          as: "personOne",
+          attributes: ["id", "firstName", "Pic", "email"],
+        },
+        {
+          model: db.User,
+          as: "personTwo",
+          attributes: ["id", "firstName", "Pic", "email"],
+        },
+      ],
+    });
+    // const UpdateChat = await db.Chat.update(
+    //   {
+    //     messageId: Message.id,
+    //   },
+    //   { where: { id: Chat.id } }
+    // );
+    // if (UpdateChat[0] == 0) {
+    //   throw new Error("somethig went wrong");
+    // }
+    if (!findChats) {
+      throw new Error("something went wrong");
     }
-    return UpdateChat;
+    return findChats;
   },
   findChat: async (body) => {
     const { id } = body;
     const findChat = await db.Chat.findAll({
-      where: { personOneId: id, blocked: false },
+      where: {
+        [Op.or]: [{ personOneId: id }, { personTwoId: id }],
+        blocked: false,
+      },
+      include: [
+        {
+          model: db.User,
+          as: "personOne", // Alias for first user
+          attributes: ["id", "firstName", "Pic", "email"], // Select specific fields
+        },
+        {
+          model: db.User,
+          as: "personTwo", // Alias for second user
+          attributes: ["id", "firstName", "Pic", "email"],
+        },
+      ],
     });
-    const findChat2 = await db.Chat.findOne({
-      where: { personTwoId: id, blocked: false },
-    });
-    if (!findChat && !findChat2) {
-      return "no chat found";
-    }
-    if (!findChat) return findChat2;
-    if (!findChat2) return findChat;
 
-    const AllUser = findChat.concat(findChat2);
-
-    return AllUser;
+    return findChat;
   },
 };

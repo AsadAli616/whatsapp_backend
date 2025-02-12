@@ -43,6 +43,7 @@ module.exports = {
     );
 
     return {
+      id: users.id,
       name: users.firstName,
       email: users.email,
       token: token,
@@ -122,7 +123,12 @@ module.exports = {
     }
     return {
       data: "your account is verified",
-      user: { name: data.firstName, email: data.email, token: token },
+      user: {
+        id: data.firstName,
+        name: data.firstName,
+        email: data.email,
+        token: token,
+      },
     };
   },
 };
