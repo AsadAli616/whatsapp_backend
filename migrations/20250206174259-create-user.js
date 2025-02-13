@@ -32,6 +32,16 @@ module.exports = {
         defaultValue: false,
         type: Sequelize.BOOLEAN,
       },
+      socketId: {
+        allowNull: true,
+        // defaultValue: "",
+        type: Sequelize.STRING,
+      },
+      status: {
+        allowNull: true,
+        defaultValue: "offline",
+        type: Sequelize.STRING,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

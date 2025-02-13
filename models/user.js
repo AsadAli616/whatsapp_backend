@@ -25,6 +25,12 @@ module.exports = (sequelize, DataTypes) => {
       code: DataTypes.STRING,
       verify: DataTypes.BOOLEAN,
       Pic: DataTypes.BOOLEAN,
+      socketId: DataTypes.STRING,
+      status: {
+        allowNull: true,
+        type: DataTypes.STRING,
+        defaultValue: "offline",
+      },
     },
     {
       sequelize,

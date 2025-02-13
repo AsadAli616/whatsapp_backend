@@ -16,7 +16,7 @@ router.post("/Verify", verifyCode);
 router.post("/addUser", auth, addChat);
 router.post("/findChats", auth, findChats);
 //Message Api
-router.post("/SendMessage", SendMessage);
-router.post("/findMessage", findMessage);
+router.post("/SendMessage", auth, SendMessage);
+router.post("/findMessage", auth, findMessage);
 
 module.exports = router;
