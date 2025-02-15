@@ -2,12 +2,12 @@ const { SocketAuth } = require("./middleware/socketMiddleware");
 const db = require("./models");
 const jwt = require("jsonwebtoken");
 let io;
+const { to } = require("./utils/error-handeling");
 
 const updateUser = async (socket) => {
   if (socket) {
     const { token } = socket.handshake.query;
     const { id } = jwt.verify(token, process.env.JWT_ID);
-    // console.log();
     const data = await db.User.update(
       { socketId: socket.id, status: "online" },
       {
@@ -25,7 +25,7 @@ const updateUserstatus = async (socket) => {
     const { token } = socket.handshake.query;
     const { id } = jwt.verify(token, process.env.JWT_ID);
     const data = await db.User.update(
-      { socketId: "", status: "offline" },
+      { socketId: null, status: "offline" },
       {
         where: {
           id: id,
@@ -35,6 +35,10 @@ const updateUserstatus = async (socket) => {
 
     if (!data) return new Error("some thing went worng");
   }
+};
+const SocketId = async (id) => {
+  const data = await db.User.findOne({ where: { id: id } });
+  return data;
 };
 function socketInit(server) {
   // console.log("Inside socket file....");
@@ -50,9 +54,16 @@ function socketInit(server) {
 
   io.on("connection", (socket) => {
     const data = updateUser(socket);
-    socket.emit("message", "Hello from server");
     socket.on("disconnect", async () => {
       updateUserstatus(socket);
+    });
+    socket.on("calling", async ({ offer, id, name }) => {
+      const data = await SocketId(id);
+      if (data.socketId) {
+        console.log(data.socketId);
+        socket.to(data.socketId).emit("incoming-call", { offer, name });
+      }
+      // here u have to send message
     });
   });
 }

@@ -26,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
       verify: DataTypes.BOOLEAN,
       Pic: DataTypes.BOOLEAN,
       socketId: DataTypes.STRING,
+      fcmToken: DataTypes.STRING,
       status: {
         allowNull: true,
         type: DataTypes.STRING,

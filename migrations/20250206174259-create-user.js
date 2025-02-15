@@ -37,6 +37,11 @@ module.exports = {
         // defaultValue: "",
         type: Sequelize.STRING,
       },
+      fcmToken: {
+        allowNull: true,
+        // defaultValue: "",
+        type: Sequelize.STRING,
+      },
       status: {
         allowNull: true,
         defaultValue: "offline",

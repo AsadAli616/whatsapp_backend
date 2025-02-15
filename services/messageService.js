@@ -49,4 +49,22 @@ module.exports = {
     }
     return Message;
   },
+  AllowNotification: async (body) => {
+    const { fcmToken, id } = body;
+    console.log(id);
+    const data = await db.User.update(
+      { fcmToken: fcmToken },
+      {
+        where: {
+          id: id,
+        },
+      }
+    );
+    if (data[0] == 0) {
+      throw new Error("token not sent");
+    }
+    console.log(data);
+
+    return data;
+  },
 };
