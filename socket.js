@@ -96,9 +96,11 @@ function socketInit(server) {
       }
     );
     socket.on("call-accepted", async ({ answer, id }) => {
+      console.log("callaccept")
       const data = await SocketId(id);
       console.log("data=>", data.socketId);
       if (data.socketId) {
+        console.log(answer)
         socket.to(data.socketId).emit("accepted-call", { answer: answer });
       }
     });
