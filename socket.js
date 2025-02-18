@@ -1,5 +1,7 @@
 const { SocketAuth } = require("./middleware/socketMiddleware");
 const db = require("./models");
+const { Op } = require("sequelize");
+
 const jwt = require("jsonwebtoken");
 let io;
 const { to } = require("./utils/error-handeling");
@@ -40,6 +42,26 @@ const SocketId = async (id) => {
   const data = await db.User.findOne({ where: { id: id } });
   return data;
 };
+const chatData = async (id) => {
+  const findChat = await db.Chat.findOne({
+    where: {
+      id: id,
+    },
+    include: [
+      {
+        model: db.User,
+        as: "personOne",
+        attributes: ["id", "firstName", "Pic", "email"],
+      },
+      {
+        model: db.User,
+        as: "personTwo",
+        attributes: ["id", "firstName", "Pic", "email"],
+      },
+    ],
+  });
+  return findChat;
+};
 function socketInit(server) {
   // console.log("Inside socket file....");
   io = require("socket.io")(server, {
@@ -57,13 +79,28 @@ function socketInit(server) {
     socket.on("disconnect", async () => {
       updateUserstatus(socket);
     });
-    socket.on("calling", async ({ offer, id, name }) => {
-      const data = await SocketId(id);
-      if (data.socketId) {
-        console.log(data.socketId);
-        socket.to(data.socketId).emit("incoming-call", { offer, name });
+    socket.on(
+      "calling",
+      async ({ offer, id, name, email, callerid, chatid }) => {
+        const data = await SocketId(id);
+        if (data.socketId) {
+          const chat = await chatData(chatid);
+
+          if (chat) {
+            socket
+              .to(data.socketId)
+              .emit("incoming-call", { offer, name, email, callerid, chat });
+          }
+        }
+        // here u have to send message
       }
-      // here u have to send message
+    );
+    socket.on("call-accepted", async ({ answer, id }) => {
+      const data = await SocketId(id);
+      console.log("data=>", data.socketId);
+      if (data.socketId) {
+        socket.to(data.socketId).emit("accepted-call", { answer: answer });
+      }
     });
   });
 }
