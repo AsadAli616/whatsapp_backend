@@ -102,6 +102,18 @@ function socketInit(server) {
         socket.to(data.socketId).emit("accepted-call", { answer: answer });
       }
     });
+    socket.on("negotiation-call", async ({ id, offer, callerid }) => {
+      const data = await SocketId(id);
+      if (data.socketId) {
+        socket.to(data.socketId).emit("negotiation", { offer, callerid });
+      }
+    });
+    socket.on("negotiation-accepted", async ({ id, answer }) => {
+      const data = await SocketId(id);
+      if (data.socketId) {
+        socket.to(data.socketId).emit("negotiation-answer", { answer: answer });
+      }
+    });
   });
 }
 function transmitDataOnRealtime(eventName, socketId, data) {
