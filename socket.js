@@ -96,11 +96,11 @@ function socketInit(server) {
       }
     );
     socket.on("call-accepted", async ({ answer, id }) => {
-      console.log("callaccept")
+      console.log("callaccept");
       const data = await SocketId(id);
       console.log("data=>", data.socketId);
       if (data.socketId) {
-        console.log(answer)
+        console.log(answer);
         socket.to(data.socketId).emit("accepted-call", { answer: answer });
       }
     });
@@ -114,6 +114,12 @@ function socketInit(server) {
       const data = await SocketId(id);
       if (data.socketId) {
         socket.to(data.socketId).emit("negotiation-answer", { answer: answer });
+      }
+    });
+    socket.on("disconect-call", async ({ id }) => {
+      const data = await SocketId(id);
+      if (data.socketId) {
+        socket.to(data.socketId).emit("call-disconnected", {});
       }
     });
   });
