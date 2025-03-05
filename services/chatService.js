@@ -24,12 +24,26 @@ module.exports = {
         {
           model: db.User,
           as: "personOne",
-          attributes: ["id", "firstName", "Pic", "email"],
+          attributes: [
+            "id",
+            "firstName",
+            "Pic",
+            "email",
+            "whatappstatus",
+            "status",
+          ],
         },
         {
           model: db.User,
           as: "personTwo",
-          attributes: ["id", "firstName", "Pic", "email"],
+          attributes: [
+            "id",
+            "firstName",
+            "Pic",
+            "email",
+            "whatappstatus",
+            "status",
+          ],
         },
       ],
     });
@@ -70,12 +84,26 @@ module.exports = {
         {
           model: db.User,
           as: "personOne",
-          attributes: ["id", "firstName", "Pic", "email"],
+          attributes: [
+            "id",
+            "firstName",
+            "Pic",
+            "email",
+            "whatappstatus",
+            "status",
+          ],
         },
         {
           model: db.User,
           as: "personTwo",
-          attributes: ["id", "firstName", "Pic", "email"],
+          attributes: [
+            "id",
+            "firstName",
+            "Pic",
+            "email",
+            "whatappstatus",
+            "status",
+          ],
         },
       ],
     });
@@ -104,12 +132,26 @@ module.exports = {
         {
           model: db.User,
           as: "personOne", // Alias for first user
-          attributes: ["id", "firstName", "Pic", "email"], // Select specific fields
+          attributes: [
+            "id",
+            "firstName",
+            "Pic",
+            "email",
+            "whatappstatus",
+            "status",
+          ], // Select specific fields
         },
         {
           model: db.User,
           as: "personTwo", // Alias for second user
-          attributes: ["id", "firstName", "Pic", "email"],
+          attributes: [
+            "id",
+            "firstName",
+            "Pic",
+            "email",
+            "whatappstatus",
+            "status",
+          ],
         },
       ],
     });

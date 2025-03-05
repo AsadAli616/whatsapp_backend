@@ -5,6 +5,27 @@ const { Op } = require("sequelize");
 const jwt = require("jsonwebtoken");
 let io;
 const { to } = require("./utils/error-handeling");
+require("dotenv").config();
+const admin = require("firebase-admin");
+const serviceAccount = JSON.parse(process.env.FIREBASE_ADMIN_CREDENTIAL_JSON);
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
+const sendFCMMessage = async (deviceToken, title, body) => {
+  const message = {
+    notification: {
+      title: title,
+      body: body,
+    },
+    token: deviceToken,
+  };
+  try {
+    const response = await admin.messaging().send(message);
+    console.log("Successfully sent message:", response);
+  } catch (error) {
+    console.error("Error sending message:", error);
+  }
+};
 
 const updateUser = async (socket) => {
   if (socket) {
@@ -40,6 +61,10 @@ const updateUserstatus = async (socket) => {
 };
 const SocketId = async (id) => {
   const data = await db.User.findOne({ where: { id: id } });
+  return data;
+};
+const userByEmail = async (email) => {
+  const data = await db.User.findOne({ where: { email: email } });
   return data;
 };
 const chatData = async (id) => {
@@ -90,11 +115,28 @@ function socketInit(server) {
             socket
               .to(data.socketId)
               .emit("incoming-call", { offer, name, email, callerid, chat });
+            if (data.fcmToken) {
+              sendFCMMessage(
+                data.fcmToken,
+                "incomming call from",
+                `name:${name}`
+              );
+            }
           }
         }
         // here u have to send message
       }
     );
+    socket.on("call-decline", async ({ email }) => {
+      const data = await userByEmail(email);
+      if (data) {
+        if (data.socketId) {
+          socket.to(data.socketId).emit("call-not-recived", "call disconnect");
+          // if (data.fcmToken && data.status !== "offline") {
+          // }
+        }
+      }
+    });
     socket.on("call-accepted", async ({ answer, id }) => {
       console.log("callaccept");
       const data = await SocketId(id);
@@ -129,4 +171,4 @@ function transmitDataOnRealtime(eventName, socketId, data) {
   console.log(socketId, data);
 }
 
-module.exports = { socketInit, transmitDataOnRealtime };
+module.exports = { socketInit, sendFCMMessage, transmitDataOnRealtime };

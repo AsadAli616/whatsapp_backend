@@ -2,7 +2,12 @@ const multer = require("multer");
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 var jwt = require("jsonwebtoken");
-const { signUp, Login, verifyCode } = require("../controller/Auth");
+const {
+  signUp,
+  Login,
+  verifyCode,
+  editeProfile,
+} = require("../controller/Auth");
 const { addChat, findChats } = require("../controller/Chat");
 const {
   SendMessage,
@@ -15,6 +20,7 @@ const router = require("express").Router();
 router.post("/SignUp", upload.single("fileInput"), signUp);
 router.post("/SignIn", Login);
 router.post("/Verify", verifyCode);
+router.post("/editeProfile", upload.single("fileInput"), editeProfile);
 
 //Chat Api
 router.post("/addUser", auth, addChat);

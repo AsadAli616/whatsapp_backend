@@ -42,6 +42,12 @@ module.exports = {
         // defaultValue: "",
         type: Sequelize.STRING,
       },
+      whatappstatus: {
+        allowNull: true,
+        defaultValue: "Hey there! I am using WhatsApp",
+        type: Sequelize.STRING,
+      },
+
       status: {
         allowNull: true,
         defaultValue: "offline",

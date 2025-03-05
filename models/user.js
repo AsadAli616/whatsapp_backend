@@ -27,6 +27,11 @@ module.exports = (sequelize, DataTypes) => {
       Pic: DataTypes.BOOLEAN,
       socketId: DataTypes.STRING,
       fcmToken: DataTypes.STRING,
+      whatappstatus: {
+        allowNull: true,
+        type: DataTypes.STRING,
+        defaultValue: "Hey there! I am using WhatsApp",
+      },
       status: {
         allowNull: true,
         type: DataTypes.STRING,

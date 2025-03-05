@@ -1,5 +1,5 @@
 const db = require("../models");
-const { transmitDataOnRealtime } = require("../socket"); // Import Socket.IO instance
+const { transmitDataOnRealtime, sendFCMMessage } = require("../socket"); // Import Socket.IO instance
 
 module.exports = {
   sendMesage: async (body) => {
@@ -28,14 +28,29 @@ module.exports = {
     if (!personTwo) {
       throw new Error("connection error");
     }
-    console.log(personTwo.socketId);
     if (personTwo.socketId && personId != personTwo.id) {
       transmitDataOnRealtime("newMessage", personTwo.socketId, data);
     }
-    console.log(personOne.socketId);
-
+    if (personTwo.fcmToken && personId != personTwo.id) {
+      sendFCMMessage(
+        personTwo.fcmToken,
+        `New message from: ${personTwo.firstName}`,
+        `message: ${data.message}`
+      );
+    }
     if (personOne.socketId && personId != personOne.id) {
-      transmitDataOnRealtime("newMessage", personOne.socketId, data);
+      transmitDataOnRealtime(
+        "newMessage",
+        personOne.socketId,
+        `message: ${data.message}`
+      );
+    }
+    if (personOne.fcmToken && personId != personOne.id) {
+      sendFCMMessage(
+        personOne.fcmToken,
+        `New message from ${personOne.firstName}`,
+        "asad"
+      );
     }
     return data;
   },
