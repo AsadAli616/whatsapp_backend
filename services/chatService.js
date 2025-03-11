@@ -1,5 +1,6 @@
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 const db = require("../models");
+const { sendFCMMessage, transmitDataOnRealtime } = require("../socket");
 
 module.exports = {
   createChat: async (body) => {
@@ -126,7 +127,6 @@ module.exports = {
     const findChat = await db.Chat.findAll({
       where: {
         [Op.or]: [{ personOneId: id }, { personTwoId: id }],
-        blocked: false,
       },
       include: [
         {
@@ -157,5 +157,137 @@ module.exports = {
     });
 
     return findChat;
+  },
+  blockChat: async (body) => {
+    const { chatId, id } = body;
+    const data = db.Chat.update(
+      { blocked: true, blockUserId: id },
+      {
+        where: { id: chatId },
+      }
+    );
+    if (data[0] == 0) {
+      throw new Error("user is not blocked");
+    }
+    const FindChat = await db.Chat.findOne({ where: { id: chatId } });
+    if (!FindChat) {
+      throw new Error("user is not blocked");
+    }
+    const personOne = await db.User.findOne({
+      where: { id: FindChat.personOneId },
+    });
+    const personTwo = await db.User.findOne({
+      where: { id: FindChat.personTwoId },
+    });
+
+    if (personOne.fcmToken && personOne.id != id) {
+      sendFCMMessage(
+        personOne.fcmToken,
+        `you have blocked by: ${personTwo.firstName}`,
+        `message`
+      );
+    }
+    if (personTwo.fcmToken && personTwo.id != id) {
+      sendFCMMessage(
+        personTwo.fcmToken,
+        `you have blocked by: ${personOne.firstName}`,
+        `message`
+      );
+    }
+    if (personTwo.socketId) {
+      transmitDataOnRealtime("blockUser", personTwo.socketId, {
+        data: "blocked user",
+      });
+    }
+    if (personOne.socketId) {
+      transmitDataOnRealtime("blockUser", personOne.socketId, {
+        data: "blocked user",
+      });
+    }
+    return data;
+  },
+  unblockChat: async (body) => {
+    const { chatId, id } = body;
+    const data = db.Chat.update(
+      { blocked: false, blockUserId: null },
+      {
+        where: { id: chatId },
+      }
+    );
+    if (data[0] == 0) {
+      throw new Error("user is not blocked");
+    }
+    const FindChat = await db.Chat.findOne({ where: { id: chatId } });
+    if (!FindChat) {
+      throw new Error("user is not unblocked");
+    }
+    const personOne = await db.User.findOne({
+      where: { id: FindChat.personOneId },
+    });
+    const personTwo = await db.User.findOne({
+      where: { id: FindChat.personTwoId },
+    });
+
+    if (personOne.fcmToken && personOne.id != id) {
+      sendFCMMessage(
+        personOne.fcmToken,
+        `you have unblocked by: ${personTwo.firstName}`,
+        `message`
+      );
+    }
+    if (personTwo.fcmToken && personTwo.id != id) {
+      sendFCMMessage(
+        personTwo.fcmToken,
+        `you have unblocked by: ${personOne.firstName}`,
+        `message`
+      );
+    }
+    if (personTwo.socketId) {
+      transmitDataOnRealtime("blockUser", personTwo.socketId, {
+        data: "unblocked user",
+      });
+    }
+    if (personOne.socketId) {
+      transmitDataOnRealtime("blockUser", personOne.socketId, {
+        data: "unblocked user",
+      });
+    }
+    return data;
+  },
+  findBlockChat: async (body) => {
+    const { id } = body;
+    const data = await db.Chat.findAll({
+      where: {
+        [Op.or]: [{ personOneId: id }, { personTwoId: id }],
+        blocked: true,
+      },
+      include: [
+        {
+          model: db.User,
+          as: "personOne",
+          attributes: [
+            "id",
+            "firstName",
+            "Pic",
+            "email",
+            "whatappstatus",
+            "status",
+          ],
+        },
+        {
+          model: db.User,
+          as: "personTwo",
+          attributes: [
+            "id",
+            "firstName",
+            "Pic",
+            "email",
+            "whatappstatus",
+            "status",
+          ],
+        },
+      ],
+    });
+    return data;
   },
 };

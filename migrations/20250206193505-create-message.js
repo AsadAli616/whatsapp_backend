@@ -20,6 +20,11 @@ module.exports = {
       message: {
         type: Sequelize.STRING,
       },
+      type: {
+        allowNull: true,
+        type: Sequelize.STRING,
+        defaultValue: "text",
+      },
       personId: {
         type: Sequelize.INTEGER,
       },

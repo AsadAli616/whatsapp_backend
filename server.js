@@ -22,5 +22,5 @@ app.get("/", function (req, res) {
   res.send("Hello ali");
 });
 
-httpServer.listen(3001);
+httpServer.listen(3002);
 socketInit(httpServer);
