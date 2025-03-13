@@ -37,6 +37,9 @@ module.exports = {
     if (!match) {
       throw new Error("Your email or password in not valid");
     }
+    if (!users.verify) {
+      throw new Error("Your email email is not verified");
+    }
     const token = jwt.sign(
       { email: users.email, id: users.id },
       process.env.JWT_ID

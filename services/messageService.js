@@ -35,7 +35,7 @@ module.exports = {
       throw new Error("connection error");
     }
     if (personTwo.socketId && personId != personTwo.id) {
-      transmitDataOnRealtime("newMessage", personTwo.socketId, data);
+      transmitDataOnRealtime("newMessage", personTwo.socketId, { data });
     }
     if (personTwo.fcmToken && personId != personTwo.id) {
       sendFCMMessage(
@@ -45,11 +45,7 @@ module.exports = {
       );
     }
     if (personOne.socketId && personId != personOne.id) {
-      transmitDataOnRealtime(
-        "newMessage",
-        personOne.socketId,
-        `message: ${data.message}`
-      );
+      transmitDataOnRealtime("newMessage", personOne.socketId, { data });
     }
     if (personOne.fcmToken && personId != personOne.id) {
       sendFCMMessage(
