@@ -46,11 +46,10 @@ module.exports = {
   },
   editeProfileValidation: async (obj) => {
     const schema = Joi.object({
-      whatappstatus: Joi.string().required().label("Email").messages({
+      whatappstatus: Joi.string().required().label("whatappstatus").messages({
         "any.required": `{#label} is Required`,
-        "string.email": "Enter a valid email",
       }),
-      name: Joi.string().required().label("code").messages({
+      name: Joi.string().required().label("name").messages({
         "any.required": `{#label} is Required`,
       }),
     });

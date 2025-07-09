@@ -37,6 +37,9 @@ module.exports = {
     if (!match) {
       throw new Error("Your email or password in not valid");
     }
+    if (!users.verify) {
+      throw new Error("Your email email is not verified");
+    }
     const token = jwt.sign(
       { email: users.email, id: users.id },
       process.env.JWT_ID
@@ -138,53 +141,59 @@ module.exports = {
   editeProfile: async (body, fileBuffer) => {
     console.log(fileBuffer);
     const { id, name, whatappstatus, fileName } = body;
-    if (fileBuffer && fileName) {
-      const uploadToCloudinary = () =>
-        new Promise((resolve, reject) => {
-          const stream = cloudinary.uploader.upload_stream(
-            { public_id: fileName, resource_type: "auto" },
-            (error, result) => {
-              if (error) return reject(error);
-              resolve(result);
-            }
-          );
-          stream.end(fileBuffer);
-        });
-      const cloudinaryResult = await uploadToCloudinary();
-      if (!cloudinaryResult.secure_url) {
-        throw new Error("something went worng try again.");
-      }
-      const data = await db.User.update(
-        {
-          firstName: name,
-          whatappstatus: whatappstatus,
-          Pic: cloudinaryResult.secure_url,
-        },
-        {
-          where: {
-            id: id,
-          },
-        }
-      );
-      if (data[0] !== 1) {
-        throw new Error("something went wrong");
-      }
-      const user = await db.User.findOne({
+    if (!fileBuffer && !fileName) {
+      throw new Error("image is note provided");
+    }
+
+    const uploadToCloudinary = () =>
+      new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { public_id: fileName, resource_type: "auto" },
+          (error, result) => {
+            if (error) return reject(error);
+            resolve(result);
+          }
+        );
+        stream.end(fileBuffer);
+      });
+    const cloudinaryResult = await uploadToCloudinary();
+    if (!cloudinaryResult.secure_url) {
+      throw new Error("something went worng try again.");
+    }
+    const data = await db.User.update(
+      {
+        firstName: name,
+        whatappstatus: whatappstatus,
+        Pic: cloudinaryResult.secure_url,
+      },
+      {
         where: {
           id: id,
         },
-      });
-      if (!user) {
-        throw new Error("something went wrong");
       }
-      console.log("user", user);
-
-      return {
-        name: user.firstName,
-        Pic: user.Pic,
-        whatappstatus: user.whatappstatus,
-      };
+    );
+    if (data[0] !== 1) {
+      throw new Error("something went wrong");
     }
+    const user = await db.User.findOne({
+      where: {
+        id: id,
+      },
+    });
+    if (!user) {
+      throw new Error("something went wrong");
+    }
+    console.log("user", user);
+
+    return {
+      name: user.firstName,
+      Pic: user.Pic,
+      whatappstatus: user.whatappstatus,
+    };
+  },
+  editDetail: async (body) => {
+    const { id, name, whatappstatus } = body;
+
     const data = await db.User.update(
       {
         firstName: name,
